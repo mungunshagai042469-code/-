@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ЭрдмийнОрчин — Багшийн Портал</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky:#3b9eff;--sky-dark:#1a7de0;--sky-light:#e8f4ff;
+  --green:#22c55e;--green-light:#dcfce7;
+  --amber:#f59e0b;--amber-light:#fef3c7;
+  --red:#ef4444;--red-light:#fee2e2;
+  --purple:#8b5cf6;--purple-light:#ede9fe;
+  --ink:#1a1a2e;--ink-mid:#374151;--ink-soft:#6b7280;--ink-muted:#9ca3af;
+  --border:#e5e7eb;--surface:#f9fafb;--white:#ffffff;
+  --sidebar-w:220px;--header-h:60px;
+  --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.08);--shadow-lg:0 8px 30px rgba(0,0,0,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--surface);color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+#loginScreen{position:fixed;inset:0;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.login-card{background:var(--white);border-radius:20px;padding:40px;width:380px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.login-logo{font-size:24px;font-weight:900;color:var(--sky);text-align:center;margin-bottom:4px;}
+.login-logo span{color:var(--ink);}
+.login-role{text-align:center;font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:28px;background:var(--amber-light);color:var(--amber);padding:4px 14px;border-radius:20px;display:inline-block;width:100%;}
+.login-label{font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;display:block;}
+.login-input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;color:var(--ink);outline:none;transition:border-color .2s;margin-bottom:16px;letter-spacing:2px;font-weight:800;text-align:center;background:var(--surface);}
+.login-input:focus{border-color:var(--sky);background:var(--white);}
+.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--sky),var(--sky-dark));color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:opacity .15s;margin-top:4px;}
+.login-btn:hover{opacity:.9;}
+.login-hint{text-align:center;font-size:12px;color:var(--ink-muted);margin-top:14px;font-weight:600;}
+
+header{height:var(--header-h);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;position:relative;z-index:100;flex-shrink:0;}
+.logo{font-size:20px;font-weight:900;color:var(--sky);letter-spacing:-.5px;white-space:nowrap;cursor:pointer;}
+.logo span{color:var(--ink);}
+.role-badge{background:var(--amber-light);color:var(--amber);font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.search-bar{flex:1;max-width:440px;position:relative;}
+.search-bar input{width:100%;padding:9px 16px 9px 38px;border:1.5px solid var(--border);border-radius:50px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;transition:border-color .2s;}
+.search-bar input:focus{border-color:var(--sky);background:var(--white);}
+.search-bar svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-muted);}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.icon-btn{width:36px;height:36px;border-radius:50%;background:none;border:1.5px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background .15s,border-color .15s;position:relative;}
+.icon-btn:hover{background:var(--surface);border-color:var(--sky);}
+.icon-btn .badge{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:var(--red);border-radius:50%;border:2px solid var(--white);font-size:8px;color:#fff;display:flex;align-items:center;justify-content:center;}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--amber);color:var(--white);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+0
+.app-body{display:flex;flex:1;overflow:hidden;}
+
+aside{width:var(--sidebar-w);background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;padding:12px 10px 20px;}
+.nav-label{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--ink-muted);text-transform:uppercase;padding:8px 10px 4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink-soft);transition:background .15s,color .15s;white-space:nowrap;}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;}
+.nav-item:hover{background:var(--amber-light);color:var(--amber);}
+.nav-item.active{background:var(--amber-light);color:var(--amber);font-weight:800;}
+.nav-divider{height:1px;background:var(--border);margin:8px 6px;}
+
+main{flex:1;overflow-y:auto;padding:24px 28px;}
+.page{display:none;}.page.active{display:block;}
+
+.page-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+.page-title{font-size:22px;font-weight:900;color:var(--ink);}
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--sky);color:#fff;}.btn-primary:hover{background:var(--sky-dark);}
+.btn-amber{background:var(--amber);color:#fff;}.btn-amber:hover{background:#d97706;}
+.btn-outline{background:var(--white);color:var(--ink);border:1.5px solid var(--border);}.btn-outline:hover{border-color:var(--sky);color:var(--sky);}
+.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#16a34a;}
+.btn-red{background:var(--red);color:#fff;}.btn-red:hover{background:#dc2626;}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:6px;}
+.ml-auto{margin-left:auto;}
+
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;}
+.course-card{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s,box-shadow .2s;border:1.5px solid var(--border);}
+.course-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.course-thumb{height:110px;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden;}
+.thumb-overlay{position:absolute;inset:0;background:rgba(0,0,0,.2);}
+.thumb-label{position:relative;z-index:1;font-size:32px;}
+.course-info{padding:14px;}
+.course-name{font-size:15px;font-weight:800;color:var(--ink);}
+.course-teacher{font-size:12px;color:var(--ink-soft);font-weight:600;margin-top:3px;}
+.course-meta{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.course-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--sky-light);color:var(--sky);}
+.add-course-card{background:var(--white);border-radius:var(--radius);border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:170px;cursor:pointer;transition:border-color .15s,background .15s;color:var(--ink-muted);}
+.add-course-card:hover{border-color:var(--amber);background:var(--amber-light);color:var(--amber);}
+.add-course-card span{font-size:13px;font-weight:700;}
+
+.stat-card{background:var(--white);border-radius:var(--radius);padding:18px 20px;border:1.5px solid var(--border);}
+.stat-num{font-size:28px;font-weight:900;}.stat-label{font-size:12px;font-weight:700;color:var(--ink-soft);margin-top:4px;}.stat-icon{font-size:22px;margin-bottom:6px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+.course-detail-header{border-radius:var(--radius);padding:28px 28px 22px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end;}
+.course-detail-header::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,.3);}
+.course-detail-header>*{position:relative;}
+.cdn-title{font-size:28px;font-weight:900;}.cdn-sub{font-size:14px;opacity:.85;font-weight:600;margin-top:4px;}
+
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:24px;}
+.tab{padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink-soft);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;}
+.tab:hover{color:var(--amber);}
+.tab.active{color:var(--amber);border-bottom-color:var(--amber);}
+
+.assignment-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:12px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:box-shadow .15s,border-color .15s;}
+.assignment-card:hover{box-shadow:var(--shadow);border-color:var(--sky);}
+.asgn-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.asgn-info{flex:1;}.asgn-title{font-size:15px;font-weight:800;color:var(--ink);}
+.asgn-meta{font-size:12px;color:var(--ink-soft);font-weight:600;margin-top:3px;}
+.asgn-right{text-align:right;flex-shrink:0;}
+.asgn-due{font-size:12px;font-weight:700;color:var(--amber);}
+.asgn-status{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;margin-top:4px;display:inline-block;}
+.status-done{background:var(--green-light);color:var(--green);}
+.status-pending{background:var(--amber-light);color:var(--amber);}
+.status-graded{background:var(--purple-light);color:var(--purple);}
+.status-missing{background:var(--red-light);color:var(--red);}
+
+.asgn-detail-wrap{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;}
+.asgn-detail-main{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;}
+.asgn-detail-title{font-size:20px;font-weight:900;margin-bottom:6px;}
+.asgn-detail-meta{font-size:13px;color:var(--ink-soft);font-weight:600;margin-bottom:16px;}
+.asgn-detail-body{font-size:14px;line-height:1.7;color:var(--ink-mid);}
+
+.file-list{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+.file-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .15s;}
+.file-item:hover{border-color:var(--sky);}
+.file-icon{font-size:22px;flex-shrink:0;}
+.file-name{flex:1;font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.file-size{font-size:11px;color:var(--ink-muted);font-weight:600;}
+.file-dl{font-size:11px;color:var(--sky);font-weight:700;cursor:pointer;}
+.file-dl:hover{text-decoration:underline;}
+
+.video-player-wrap{border-radius:10px;overflow:hidden;margin:16px 0;background:#000;aspect-ratio:16/9;position:relative;}
+.video-player-wrap video{width:100%;height:100%;display:block;}
+.video-placeholder{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:10px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin:16px 0;cursor:pointer;position:relative;overflow:hidden;}
+.play-btn{width:54px;height:54px;background:rgba(255,255,255,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--sky);z-index:1;transition:transform .15s;}
+.play-btn:hover{transform:scale(1.1);}
+
+.submit-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;position:sticky;top:0;}
+.submit-card h3{font-size:15px;font-weight:800;margin-bottom:14px;}
+
+.upload-area{border:2px dashed var(--border);border-radius:10px;padding:24px 20px;text-align:center;cursor:pointer;transition:all .15s;color:var(--ink-muted);font-size:13px;font-weight:600;position:relative;}
+.upload-area:hover,.upload-area.dragover{border-color:var(--sky);background:var(--sky-light);color:var(--sky);}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:28px;margin-bottom:8px;}
+.uploaded-files{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
+.uploaded-file{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;font-weight:700;}
+.uploaded-file .remove-file{margin-left:auto;cursor:pointer;color:var(--red);font-size:14px;line-height:1;}
+
+.grade-input{width:70px;padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:14px;font-family:inherit;font-weight:700;text-align:center;color:var(--ink);outline:none;background:var(--surface);transition:border-color .15s;}
+.grade-input:focus{border-color:var(--sky);background:var(--white);}
+.grade-pill{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:24px;border-radius:6px;font-size:12px;font-weight:800;padding:0 8px;}
+
+.grades-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.grades-table th{background:var(--surface);padding:12px 16px;font-size:12px;font-weight:800;text-align:left;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.grades-table td{padding:10px 16px;font-size:13px;border-bottom:1px solid var(--border);font-weight:600;}
+.grades-table tr:last-child td{border-bottom:none;}
+.grades-table tr:hover td{background:var(--amber-light);}
+
+.comment-input-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;}
+.comment-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;resize:none;outline:none;transition:border-color .15s;background:var(--surface);color:var(--ink);}
+.comment-input:focus{border-color:var(--sky);background:var(--white);}
+.comment-card{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}
+.comment-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;}
+.comment-body{flex:1;}.comment-author{font-size:13px;font-weight:800;}
+.comment-date{font-size:11px;color:var(--ink-muted);margin-left:6px;}
+.comment-text{font-size:13px;color:var(--ink-mid);margin-top:4px;line-height:1.6;}
+.comment-attachment{margin-top:8px;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;}
+.comment-attachment:hover{border-color:var(--sky);}
+
+.member-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:box-shadow .15s;}
+.member-card:hover{box-shadow:var(--shadow);}
+.member-info{flex:1;}.member-name{font-size:14px;font-weight:800;}
+.member-role{font-size:12px;color:var(--ink-soft);font-weight:600;margin-top:2px;}
+
+.sub-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.sub-row:last-child{border-bottom:none;}
+
+.notif-item{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;cursor:pointer;transition:background .15s;}
+.notif-item:hover{background:var(--amber-light);}
+.notif-item.unread{background:var(--amber-light);}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:5px;}
+.notif-text{font-size:13px;color:var(--ink-mid);font-weight:600;line-height:1.5;}
+.notif-time{font-size:11px;color:var(--ink-muted);margin-top:3px;}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:16px;padding:28px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease;}
+@keyframes modalIn{from{transform:scale(.95) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:20px;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--ink);background:var(--surface);outline:none;transition:border-color .15s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--sky);background:var(--white);}
+.form-textarea{resize:vertical;min-height:80px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+
+.color-swatches{display:flex;gap:8px;flex-wrap:wrap;}
+.swatch{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;}
+.swatch:hover{transform:scale(1.15);}
+.swatch.selected{border-color:var(--ink);}
+
+.sub-file-preview{border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;background:var(--surface);}
+.sub-file-preview .file-thumb{width:100%;aspect-ratio:16/9;background:var(--ink);border-radius:6px;overflow:hidden;margin-bottom:10px;display:flex;align-items:center;justify-content:center;}
+.sub-file-preview img,.sub-file-preview video{width:100%;height:100%;object-fit:contain;}
+
+.section-title{font-size:16px;font-weight:900;color:var(--ink);margin-bottom:14px;margin-top:24px;}
+.section-title:first-child{margin-top:0;}
+
+.join-code{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1.5px dashed var(--border);border-radius:8px;padding:8px 14px;font-size:18px;font-weight:900;letter-spacing:3px;color:var(--amber);cursor:pointer;transition:background .15s;}
+.join-code:hover{background:var(--amber-light);}
+
+.empty-state{text-align:center;padding:48px 20px;color:var(--ink-muted);}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-state p{font-size:14px;font-weight:600;}
+.progress-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:8px;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--sky),var(--purple));transition:width .5s ease;}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:50px;font-size:13px;font-weight:700;z-index:9999;transition:transform .3s ease;pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">Эрдмийн<span>Орчин</span></div>
+    <div class="login-role">👨‍🏫 Багшийн Портал</div>
+    <label class="login-label">Багшийн нэр</label>
+    <input class="login-input" id="loginNameInput" type="text" placeholder="Нэрээ оруулна уу" style="letter-spacing: normal;">
+    <label class="login-label">Багшийн нэвтрэх код</label>
+    <input class="login-input" id="loginCodeInput" type="password" placeholder="• • • • • •" maxlength="10"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Нэвтрэх</button>
+    <div class="login-hint">Сурагчийн хуудас: <b>suragch.html</b> файлыг нээнэ үү</div>
+  </div>
+</div>
+
+<header>
+  <div class="logo" onclick="navigateTo('home')">Эрдмийн<span>Орчин</span></div>
+  <span class="role-badge">👨‍🏫 Багш</span>
+  <div class="search-bar">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Хичээл, даалгавар хайх...">
+  </div>
+  <div class="header-right">
+    <div class="icon-btn" onclick="navigateTo('notifications')" title="Мэдэгдэл">🔔<div class="badge">2</div></div>
+    <div class="icon-btn" title="Чат">💬</div>
+    <div class="avatar" title="Профайл" id="avatarBtn">OS</div>
+  </div>
+</header>
+
+<div class="app-body">
+<aside>
+  <div class="nav-label">Үндсэн</div>
+  <div class="nav-item active" id="nav-home" onclick="navigateTo('home')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Нүүр хуудас
+  </div>
+  <div class="nav-item" id="nav-courses" onclick="navigateTo('courses')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Хичээлүүд
+  </div>
+  <div class="nav-item" id="nav-assignments" onclick="navigateTo('assignments')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Даалгаврууд
+  </div>
+  <div class="nav-item" id="nav-grades" onclick="navigateTo('grades')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Дүнгийн дэвтэр
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-label">Систем</div>
+  <div class="nav-item" id="nav-notifications" onclick="navigateTo('notifications')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Мэдэгдэл
+  </div>
+</aside>
+
+<main>
+  <div class="page active" id="page-home">
+    <div class="page-header">
+      <div><div class="page-title" id="welcomeMsg">Сайн байна уу! 👋</div><div style="font-size:13px;color:var(--ink-soft);font-weight:600">Өнөөдрийн хичээлд тавтай морил</div></div>
+      <button class="btn btn-amber ml-auto" onclick="openModal('createCourseModal')">+ Хичээл үүсгэх</button>
+    </div>
+    <div class="three-col" style="margin-bottom:24px">
+      <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-num" id="statCourses">0</div><div class="stat-label">Нийт хичээл</div></div>
+      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="statStudents">0</div><div class="stat-label">Нийт сурагч</div></div>
+      <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-num" id="statAsgns">0</div><div class="stat-label">Нийт даалгавар</div></div>
+    </div>
+    <div class="section-title">Миний хичээлүүд</div>
+    <div class="course-grid" id="homeCourseGrid"></div>
+  </div>
+
+  <div class="page" id="page-courses">
+    <div class="page-header">
+      <div class="page-title">Хичээлүүд</div>
+      <button class="btn btn-amber ml-auto" onclick="openModal('createCourseModal')">+ Шинэ хичээл</button>
+    </div>
+    <div class="course-grid" id="coursesPageGrid"></div>
+  </div>
+
+  <div class="page" id="page-course-detail"><div id="courseDetailContent"></div></div>
+
+  <div class="page" id="page-assignment-detail"><div id="assignmentDetailContent"></div></div>
+
+  <div class="page" id="page-assignments">
+    <div class="page-header"><div class="page-title">Бүх даалгаврууд</div></div>
+    <div id="allAssignmentsList"></div>
+  </div>
+
+  <div class="page" id="page-grades">
+    <div class="page-header"><div class="page-title">Дүнгийн дэвтэр</div></div>
+    <div id="gradesContent"></div>
+  </div>
+
+  <div class="page" id="page-notifications">
+    <div class="page-header">
+      <div class="page-title">Мэдэгдэл</div>
+      <button class="btn btn-outline btn-sm ml-auto" onclick="markAllRead()">Бүгдийг уншсан болгох</button>
+    </div>
+    <div style="background:var(--white);border-radius:var(--radius);border:1.5px solid var(--border);overflow:hidden">
+      <div class="notif-item unread"><div class="notif-dot"></div><div><div class="notif-text">📤 <b>Болд Д.</b> Java даалгаврыг илгээлээ</div><div class="notif-time">15 минутын өмнө</div></div></div>
+      <div class="notif-item unread"><div class="notif-dot"></div><div><div class="notif-text">👤 Шинэ сурагч <b>Биологи</b> хичээлд нэгдлээ</div><div class="notif-time">1 цагийн өмнө</div></div></div>
+      <div class="notif-item"><div class="notif-dot" style="background:transparent"></div><div><div class="notif-text">📣 Системийн шинэчлэл хийгдлээ</div><div class="notif-time">2026.03.20</div></div></div>
+    </div>
+  </div>
+</main>
+</div>
+
+<div class="modal-overlay" id="createCourseModal">
+  <div class="modal">
+    <div class="modal-title">📚 Шинэ хичээл үүсгэх</div>
+    <div class="form-group"><label class="form-label">Хичээлийн нэр *</label><input class="form-input" id="newCourseName" placeholder="жш: Математик, Физик..."></div>
+    <div class="form-group"><label class="form-label">Тайлбар</label><textarea class="form-textarea" id="newCourseDesc" placeholder="Хичээлийн тухай..."></textarea></div>
+    <div class="form-group">
+      <label class="form-label">Өнгө</label>
+      <div class="color-swatches" id="colorSwatches">
+        <div class="swatch selected" style="background:#3b9eff" data-color="#3b9eff" onclick="selectColor(this)"></div>
+        <div class="swatch" style="background:#22c55e" data-color="#22c55e" onclick="selectColor(this)"></div>
+        <div class="swatch" style="background:#f59e0b" data-color="#f59e0b" onclick="selectColor(this)"></div>
+        <div class="swatch" style="background:#ef4444" data-color="#ef4444" onclick="selectColor(this)"></div>
+        <div class="swatch" style="background:#8b5cf6" data-color="#8b5cf6" onclick="selectColor(this)"></div>
+        <div class="swatch" style="background:#ec4899" data-color="#ec4899" onclick="selectColor(this)"></div>
+        <div class="swatch" style="background:#06b6d4" data-color="#06b6d4" onclick="selectColor(this)"></div>
+        <div class="swatch" style="background:#1a1a2e" data-color="#1a1a2e" onclick="selectColor(this)"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('createCourseModal')">Цуцлах</button>
+      <button class="btn btn-amber" onclick="createCourse()">Үүсгэх</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="createAssignmentModal">
+  <div class="modal">
+    <div class="modal-title">📝 Шинэ даалгавар нэмэх</div>
+    <div class="form-group"><label class="form-label">Гарчиг *</label><input class="form-input" id="newAsgnTitle" placeholder="Даалгаврын нэр..."></div>
+    <div class="form-group"><label class="form-label">Тайлбар / Заавар</label><textarea class="form-textarea" id="newAsgnDesc" placeholder="Сурагчдад хариуцуулах ажлаа тайлбарла..."></textarea></div>
+    <div class="two-col">
+      <div class="form-group"><label class="form-label">Дуусах хугацаа</label><input class="form-input" id="newAsgnDue" type="date"></div>
+      <div class="form-group"><label class="form-label">Оноо</label><input class="form-input" id="newAsgnPoints" type="number" value="100" min="0"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Төрөл</label>
+      <select class="form-select" id="newAsgnType">
+        <option value="assignment">📝 Даалгавар</option>
+        <option value="video">🎬 Видео хичээл</option>
+        <option value="material">📄 Материал</option>
+        <option value="quiz">🧪 Тест</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Файл хавсаргах (видео, PDF, Word, зураг...)</label>
+      <div class="upload-area" id="teacherUploadArea">
+        <input type="file" id="teacherFileInput" multiple accept="video/*,image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" onchange="handleTeacherFiles(this)">
+        <div class="upload-icon">📎</div>
+        <div>Файл чирж оруулах эсвэл дарж сонгоно уу</div>
+        <div style="font-size:11px;margin-top:4px;color:var(--ink-muted)">Видео, PDF, Word, PowerPoint, Зураг дэмжигдэнэ</div>
+      </div>
+      <div class="uploaded-files" id="teacherUploadedFiles"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('createAssignmentModal')">Цуцлах</button>
+      <button class="btn btn-amber" onclick="createAssignment()">Нэмэх</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="submissionModal">
+  <div class="modal">
+    <div class="modal-title" id="submissionModalTitle">Сурагчийн ажил</div>
+    <div id="submissionModalContent"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('submissionModal')">Хаах</button>
+      <button class="btn btn-green" onclick="saveGradeFromModal()">Дүн хадгалах ✓</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+
+const TEACHER_CODE = 'teacher';
+let teacherName = 'O.Suhee';
+let teacherInitials = 'OS';
+
+function doLogin() {
+  const nameVal = document.getElementById('loginNameInput').value.trim();
+  const codeVal = document.getElementById('loginCodeInput').value.trim();
+
+  if (nameVal !== teacherName) {
+    document.getElementById('loginNameInput').style.borderColor = 'var(--red)';
+    showToast('❌ Багшийн нэр буруу байна');
+    setTimeout(()=>document.getElementById('loginNameInput').style.borderColor='',1500);
+    return;
+  }
+
+  if (codeVal === TEACHER_CODE) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('welcomeMsg').textContent = `Сайн байна уу, ${teacherName}! 👋`;
+    document.getElementById('avatarBtn').textContent = teacherInitials;
+    renderHomeCourses();
+    updateStats();
+  } else {
+    document.getElementById('loginCodeInput').style.borderColor = 'var(--red)';
+    showToast('❌ Код буруу байна');
+    setTimeout(()=>document.getElementById('loginCodeInput').style.borderColor='',1500);
+  }
+}
+
+let selectedColor = '#3b9eff';
+let currentCourseId = null;
+let currentAsgnId = null;
+let gradeModalStudentId = null;
+let gradeModalAsgnId = null;
+
+const COLORS = {
+  '#3b9eff':'linear-gradient(135deg,#3b9eff,#1a7de0)',
+  '#22c55e':'linear-gradient(135deg,#22c55e,#16a34a)',
+  '#f59e0b':'linear-gradient(135deg,#f59e0b,#d97706)',
+  '#ef4444':'linear-gradient(135deg,#ef4444,#dc2626)',
+  '#8b5cf6':'linear-gradient(135deg,#8b5cf6,#7c3aed)',
+  '#ec4899':'linear-gradient(135deg,#ec4899,#db2777)',
+  '#06b6d4':'linear-gradient(135deg,#06b6d4,#0891b2)',
+  '#1a1a2e':'linear-gradient(135deg,#1a1a2e,#374151)',
+};
+const EMOJIS = {'#3b9eff':'☕','#22c55e':'🌿','#f59e0b':'⚡','#ef4444':'🔥','#8b5cf6':'🔮','#ec4899':'🌸','#06b6d4':'🌊','#1a1a2e':'🌑'};
+
+let courses = [
+  {id:1,name:'Java',teacher:'O.Suhee',color:'#3b9eff',emoji:'☕',desc:'Java програмчлалын хэл',joinCode:'JAV001',students:5},
+  {id:2,name:'HTML',teacher:'O.Suhee',color:'#ef4444',emoji:'🌐',desc:'Вэб хөгжүүлэлтийн үндэс',joinCode:'HTM002',students:4},
+];
+
+let assignments = [
+  {id:1,courseId:1,title:'Хэрэгжүүлэлт 2',desc:'ArrayList ашиглан стек хэрэгжүүл.',type:'assignment',due:'2026-03-28',points:100,emoji:'📝',color:'#fef3c7',files:[]},
+  {id:2,courseId:1,title:'Java Basics видео',desc:'Үндсэн ойлголтууд.',type:'video',due:null,points:0,emoji:'🎬',color:'#dbeafe',files:[]},
+  {id:3,courseId:2,title:'Анхны вэб хуудас',desc:'HTML ашиглан CV хуудас үүсгэ.',type:'assignment',due:'2026-03-30',points:80,emoji:'📝',color:'#fef3c7',files:[]},
+];
+
+const students = [
+  {id:1,name:'Болд Д.',initials:'БД',color:'#3b9eff'},
+  {id:2,name:'Нандин О.',initials:'НО',color:'#22c55e'},
+  {id:3,name:'Гантулга Б.',initials:'ГБ',color:'#8b5cf6'},
+  {id:4,name:'Солонго Э.',initials:'СЭ',color:'#ec4899'},
+  {id:5,name:'Энхбаяр Н.',initials:'ЭН',color:'#f59e0b'},
+];
+
+let submissions = {};
+students.forEach(s=>{
+  assignments.filter(a=>a.points>0).forEach(a=>{
+    const key=`${a.id}_${s.id}`;
+    const r=Math.random();
+    if(r<0.5) submissions[key]={status:'submitted',grade:null,files:[{name:'ажил.pdf',url:null,type:'application/pdf',size:'1.2 MB'}]};
+    else submissions[key]={status:'not_submitted',grade:null,files:[]};
+  });
+});
+
+let comments = {
+  1:[
+    {author:'О. Сүхээ',initials:'ОС',color:'#f59e0b',role:'teacher',text:'ArrayList-ийн гарын авлагыг судлаарай.',date:'2026.03.22',files:[]},
+    {author:'Болд Д.',initials:'БД',color:'#22c55e',role:'student',text:'Багш, push функцийн параметр яг ямар байх ёстой вэ?',date:'2026.03.23',files:[]},
+  ]
+};
+
+let teacherUploadedFiles = [];
+
+function getFileIcon(type){
+  if(!type) return '📎';
+  if(type.startsWith('video')) return '🎬';
+  if(type.startsWith('image')) return '🖼️';
+  if(type.includes('pdf')) return '📄';
+  if(type.includes('word')||type.includes('docx')||type.includes('doc')) return '📝';
+  if(type.includes('sheet')||type.includes('excel')||type.includes('xlsx')) return '📊';
+  if(type.includes('presentation')||type.includes('pptx')||type.includes('powerpoint')) return '📑';
+  return '📎';
+}
+function formatSize(bytes){
+  if(!bytes) return '';
+  if(bytes<1024) return bytes+'B';
+  if(bytes<1048576) return (bytes/1024).toFixed(1)+'KB';
+  return (bytes/1048576).toFixed(1)+'MB';
+}
+
+function handleTeacherFiles(input) {
+  Array.from(input.files).forEach(f=>{
+    const url = URL.createObjectURL(f);
+    teacherUploadedFiles.push({name:f.name,url,type:f.type,size:formatSize(f.size),_file:f});
+  });
+  renderTeacherUploadedFiles();
+}
+function renderTeacherUploadedFiles(){
+  const c=document.getElementById('teacherUploadedFiles');
+  if(!c) return;
+  c.innerHTML=teacherUploadedFiles.map((f,i)=>`
+    <div class="uploaded-file">
+      <span>${getFileIcon(f.type)}</span>
+      <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.name}</span>
+      <span style="color:var(--ink-muted);font-size:11px">${f.size}</span>
+      <span class="remove-file" onclick="removeTeacherFile(${i})">✕</span>
+    </div>`).join('');
+}
+function removeTeacherFile(i){
+  teacherUploadedFiles.splice(i,1);
+  renderTeacherUploadedFiles();
+}
+
+function renderFileList(files){
+  if(!files||!files.length) return '';
+  return `<div class="file-list">${files.map(f=>`
+    <div class="file-item" onclick="openFile('${f.url}','${f.type}','${f.name}')">
+      <div class="file-icon">${getFileIcon(f.type)}</div>
+      <div class="file-name">${f.name}</div>
+      <div class="file-size">${f.size||''}</div>
+      <a href="${f.url||'#'}" download="${f.name}" class="file-dl" onclick="event.stopPropagation()">⬇ Татах</a>
+    </div>`).join('')}</div>`;
+}
+
+function openFile(url, type, name){
+  if(!url){showToast('Файл байхгүй');return;}
+  if(type&&type.startsWith('video')){
+    const w=window.open('','_blank');
+    w.document.write(`<video src="${url}" controls autoplay style="max-width:100%;max-height:100vh"></video>`);
+  } else if(type&&type.startsWith('image')){
+    const w=window.open('','_blank');
+    w.document.write(`<img src="${url}" style="max-width:100%;max-height:100vh">`);
+  } else {
+    const a=document.createElement('a');
+    a.href=url;a.download=name;a.click();
+  }
+}
+
+function navigateTo(page, id=null){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  const navEl=document.getElementById(`nav-${page}`);
+  if(navEl) navEl.classList.add('active');
+  if(page==='home'){renderHomeCourses();updateStats();}
+  if(page==='courses') renderCoursesPage();
+  if(page==='assignments') renderAllAssignments();
+  if(page==='grades') renderGrades();
+  if(page==='course-detail'&&id){currentCourseId=id;renderCourseDetail(id);}
+  if(page==='assignment-detail'&&id){currentAsgnId=id;renderAssignmentDetail(id);}
+}
+
+function updateStats(){
+  document.getElementById('statCourses').textContent=courses.length;
+  document.getElementById('statStudents').textContent=students.length;
+  document.getElementById('statAsgns').textContent=assignments.length;
+}
+
+function renderHomeCourses(){
+  const g=document.getElementById('homeCourseGrid');
+  if(!g) return;
+  g.innerHTML=courses.map(c=>courseCardHTML(c)).join('')+
+    `<div class="add-course-card" onclick="openModal('createCourseModal')"><div style="font-size:32px">➕</div><span>Шинэ хичээл</span></div>`;
+}
+function renderCoursesPage(){
+  const g=document.getElementById('coursesPageGrid');
+  g.innerHTML=courses.map(c=>courseCardHTML(c)).join('')+
+    `<div class="add-course-card" onclick="openModal('createCourseModal')"><div style="font-size:32px">➕</div><span>Шинэ хичээл</span></div>`;
+}
+function courseCardHTML(c){
+  const bg=COLORS[c.color]||c.color;
+  return `<div class="course-card" onclick="navigateTo('course-detail',${c.id})">
+    <div class="course-thumb" style="background:${bg}"><div class="thumb-overlay"></div><div class="thumb-label">${c.emoji}</div></div>
+    <div class="course-info">
+      <div class="course-name">${c.name}</div>
+      <div class="course-teacher">${c.teacher}</div>
+      <div class="course-meta">
+        <span class="course-badge">👥 ${c.students}</span>
+        <span class="course-badge">📝 ${assignments.filter(a=>a.courseId===c.id).length}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderCourseDetail(id){
+  const c=courses.find(x=>x.id===id); if(!c) return;
+  const bg=COLORS[c.color]||c.color;
+  const asgns=assignments.filter(a=>a.courseId===id);
+  document.getElementById('courseDetailContent').innerHTML=`
+    <div style="margin-bottom:14px"><span onclick="navigateTo('courses')" style="cursor:pointer;color:var(--ink-soft);font-size:13px;font-weight:700">← Буцах</span></div>
+    <div class="course-detail-header" style="background:${bg}">
+      <div class="cdn-title">${c.emoji} ${c.name}</div>
+      <div class="cdn-sub">${c.teacher} · ${c.students} сурагч</div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="openModal('createAssignmentModal')">+ Даалгавар нэмэх</button>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="showJoinCode('${c.joinCode}')">🔑 Нэгдэх код</button>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="deleteCourse(${c.id})">🗑 Устгах</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" id="tab-stream" onclick="switchTab('stream',${id})">Мэдээ</div>
+      <div class="tab" id="tab-assignments" onclick="switchTab('assignments',${id})">Даалгаврууд</div>
+      <div class="tab" id="tab-members" onclick="switchTab('members',${id})">Гишүүд</div>
+      <div class="tab" id="tab-gradebook" onclick="switchTab('gradebook',${id})">Дүнгийн дэвтэр</div>
+    </div>
+    <div id="tabContent">${renderStreamTab(c,asgns)}</div>`;
+}
+
+function switchTab(tab,courseId){
+  ['stream','assignments','members','gradebook'].forEach(t=>{
+    const el=document.getElementById(`tab-${t}`); if(el) el.classList.toggle('active',t===tab);
+  });
+  const c=courses.find(x=>x.id===courseId);
+  const asgns=assignments.filter(a=>a.courseId===courseId);
+  const tc=document.getElementById('tabContent');
+  if(tab==='stream') tc.innerHTML=renderStreamTab(c,asgns);
+  if(tab==='assignments') tc.innerHTML=renderAssignmentsTab(asgns);
+  if(tab==='members') tc.innerHTML=renderMembersTab(c);
+  if(tab==='gradebook') tc.innerHTML=renderGradebookTab(courseId);
+}
+
+function renderStreamTab(c,asgns){
+  return `<div style="display:grid;grid-template-columns:1fr 260px;gap:20px">
+    <div>
+      <div class="section-title">Сүүлийн даалгаврууд</div>
+      ${asgns.slice(0,4).map(a=>`
+        <div class="assignment-card" onclick="navigateTo('assignment-detail',${a.id})">
+          <div class="asgn-icon" style="background:${a.color}">${a.emoji}</div>
+          <div class="asgn-info"><div class="asgn-title">${a.title}</div><div class="asgn-meta">${a.type==='video'?'Видео':a.type==='quiz'?'Тест':a.type==='material'?'Материал':'Даалгавар'} · ${a.points>0?a.points+' оноо':'Оноогүй'}</div></div>
+          ${a.due?`<div class="asgn-right"><div class="asgn-due">📅 ${a.due}</div></div>`:''}
+        </div>`).join('')}
+      ${asgns.length===0?'<div class="empty-state"><div class="empty-icon">📭</div><p>Даалгавар байхгүй. + Нэмэх товчийг дарна уу.</p></div>':''}
+    </div>
+    <div>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:800;margin-bottom:10px">Нэгдэх код</div>
+        <div class="join-code" onclick="copyCode('${c.joinCode}')">${c.joinCode} 📋</div>
+        <div style="font-size:11px;color:var(--ink-muted);font-weight:600;margin-top:8px">Дарж хуулна уу</div>
+      </div>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px">
+        <div style="font-size:14px;font-weight:800;margin-bottom:10px">Статистик</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink-soft)">Сурагч: <b style="color:var(--ink)">${c.students}</b></div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink-soft);margin-top:6px">Даалгавар: <b style="color:var(--ink)">${asgns.length}</b></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAssignmentsTab(asgns){
+  if(!asgns.length) return '<div class="empty-state"><div class="empty-icon">📭</div><p>Даалгавар байхгүй байна</p></div>';
+  return asgns.map(a=>`
+    <div class="assignment-card" onclick="navigateTo('assignment-detail',${a.id})">
+      <div class="asgn-icon" style="background:${a.color}">${a.emoji}</div>
+      <div class="asgn-info">
+        <div class="asgn-title">${a.title}</div>
+        <div class="asgn-meta">${a.type==='video'?'Видео хичээл':a.type==='quiz'?'Тест':a.type==='material'?'Материал':'Даалгавар'} · ${a.points>0?a.points+' оноо':'Оноогүй'}</div>
+      </div>
+      <div class="asgn-right">
+        ${a.due?`<div class="asgn-due">📅 ${a.due}</div>`:''}
+        <button class="btn btn-red btn-sm" style="margin-top:4px" onclick="event.stopPropagation();deleteAssignment(${a.id})">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderMembersTab(c){
+  return `
+    <div class="section-title">Багш</div>
+    <div class="member-card">
+      <div class="comment-avatar" style="background:${c.color};width:38px;height:38px;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff;border-radius:50%">${c.teacher.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+      <div class="member-info"><div class="member-name">${c.teacher}</div><div class="member-role">Хичээлийн багш</div></div>
+      <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--amber-light);color:var(--amber)">Багш</span>
+    </div>
+    <div class="section-title">Сурагчид (${students.length})</div>
+    ${students.map(s=>`
+      <div class="member-card">
+        <div style="width:38px;height:38px;border-radius:50%;background:${s.color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0">${s.initials}</div>
+        <div class="member-info"><div class="member-name">${s.name}</div><div class="member-role">Сурагч</div></div>
+        <button class="btn btn-outline btn-sm" onclick="showToast('${s.name} мессеж')">💬</button>
+      </div>`).join('')}`;
+}
+
+function renderGradebookTab(courseId){
+  const asgns=assignments.filter(a=>a.courseId===courseId&&a.points>0);
+  if(!asgns.length) return '<div class="empty-state"><div class="empty-icon">📊</div><p>Оноотой даалгавар байхгүй</p></div>';
+  return `<div style="overflow-x:auto"><table class="grades-table"><thead><tr>
+    <th>Сурагч</th>
+    ${asgns.map(a=>`<th style="white-space:nowrap">${a.emoji} ${a.title}</th>`).join('')}
+    <th>Дундаж</th></tr></thead><tbody>
+    ${students.map(s=>{
+      const grades=asgns.map(a=>submissions[`${a.id}_${s.id}`]?.grade??null);
+      const valid=grades.filter(g=>g!==null);
+      const avg=valid.length?Math.round(valid.reduce((a,b)=>a+b,0)/valid.length):null;
+      return `<tr><td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:26px;height:26px;border-radius:50%;background:${s.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff">${s.initials}</div>${s.name}</div></td>
+        ${grades.map((g,i)=>`<td>
+          <div style="display:flex;align-items:center;gap:6px">
+            ${submissions[`${asgns[i].id}_${s.id}`]?.status==='submitted'||g!==null?`
+              <input class="grade-input" type="number" value="${g??''}" min="0" max="${asgns[i].points}" placeholder="-"
+                style="width:55px" onchange="updateGrade(${asgns[i].id},${s.id},this.value,${asgns[i].points})">
+              <span style="font-size:11px;color:var(--ink-muted)">/${asgns[i].points}</span>
+            `:`<span style="color:var(--ink-muted);font-weight:700">—</span>`}
+          </div></td>`).join('')}
+        <td>${avg!==null?`<span class="grade-pill" style="background:${avg>=80?'var(--green-light)':avg>=60?'var(--amber-light)':'var(--red-light)'};color:${avg>=80?'var(--green)':avg>=60?'var(--amber)':'var(--red)'}">${avg}%</span>`:'<span style="color:var(--ink-muted)">—</span>'}</td>
+      </tr>`;}).join('')}
+    </tbody></table></div>
+    <button class="btn btn-amber" style="margin-top:16px" onclick="showToast('Дүн хадгалагдлаа ✓')">💾 Дүн хадгалах</button>`;
+}
+
+function renderAssignmentDetail(id){
+  const a=assignments.find(x=>x.id===id); if(!a) return;
+  const c=courses.find(x=>x.id===a.courseId);
+  const cmnts=comments[id]||[];
+  const subs=students.map(s=>({student:s,sub:submissions[`${a.id}_${s.id}`]||{status:'not_submitted',grade:null,files:[]}}));
+  const submitted=subs.filter(x=>['submitted','graded'].includes(x.sub.status));
+
+  document.getElementById('assignmentDetailContent').innerHTML=`
+    <div style="margin-bottom:14px"><span onclick="navigateTo('course-detail',${c.id})" style="cursor:pointer;color:var(--ink-soft);font-size:13px;font-weight:700">← ${c.name}</span></div>
+    <div class="asgn-detail-wrap">
+      <div>
+        <div class="asgn-detail-main">
+          <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px">
+            <div class="asgn-icon" style="background:${a.color}">${a.emoji}</div>
+            <div style="flex:1">
+              <div class="asgn-detail-title">${a.title}</div>
+              <div class="asgn-detail-meta">${c.name} · ${a.due?'📅 '+a.due+' ·':''} ${a.points?a.points+' оноо':'Оноогүй'}</div>
+            </div>
+            <button class="btn btn-red btn-sm" onclick="deleteAssignment(${a.id})">🗑 Устгах</button>
+          </div>
+          <div class="asgn-detail-body">${a.desc}</div>
+          ${a.files&&a.files.length?`<div style="margin-top:16px;font-size:13px;font-weight:800;color:var(--ink-soft)">Хавсаргасан файлууд</div>${renderFileList(a.files)}`:''}
+        </div>
+        <div class="asgn-detail-main" style="margin-top:16px">
+          <div style="font-size:15px;font-weight:800;margin-bottom:14px">💬 Сэтгэгдэл (${cmnts.length})</div>
+          <div class="comment-input-row">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">${teacherInitials}</div>
+            <textarea class="comment-input" id="commentInput_${id}" rows="2" placeholder="Сэтгэгдэл бичих..."></textarea>
+            <button class="btn btn-amber btn-sm" onclick="postComment(${id})">Илгээх</button>
+          </div>
+          ${cmnts.map(cm=>`
+            <div class="comment-card">
+              <div class="comment-avatar" style="background:${cm.color}">${cm.initials}</div>
+              <div class="comment-body">
+                <span class="comment-author">${cm.author}</span>
+                <span class="comment-date">${cm.date}</span>
+                ${cm.role==='teacher'?`<span style="font-size:10px;background:var(--amber-light);color:var(--amber);padding:2px 7px;border-radius:10px;font-weight:800;margin-left:4px">Багш</span>`:''}
+                <div class="comment-text">${cm.text}</div>
+                ${cm.files&&cm.files.length?cm.files.map(f=>`<div class="comment-attachment" onclick="openFile('${f.url}','${f.type}','${f.name}')">${getFileIcon(f.type)} ${f.name}</div>`).join(''):''}
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="submit-card">
+          <h3>📤 Илгээлтүүд</h3>
+          <div style="display:flex;gap:10px;margin-bottom:16px">
+            <div style="flex:1;text-align:center;background:var(--green-light);border-radius:8px;padding:10px">
+              <div style="font-size:22px;font-weight:900;color:var(--green)">${submitted.length}</div>
+              <div style="font-size:11px;font-weight:700;color:var(--green)">Илгээсэн</div>
+            </div>
+            <div style="flex:1;text-align:center;background:var(--red-light);border-radius:8px;padding:10px">
+              <div style="font-size:22px;font-weight:900;color:var(--red)">${students.length-submitted.length}</div>
+              <div style="font-size:11px;font-weight:700;color:var(--red)">Илгээгээгүй</div>
+            </div>
+          </div>
+          ${subs.map(({student:s,sub})=>`
+            <div class="sub-row">
+              <div style="width:28px;height:28px;border-radius:50%;background:${s.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">${s.initials}</div>
+              <div style="flex:1;font-size:13px;font-weight:700">${s.name}</div>
+              ${sub.status==='submitted'||sub.status==='graded'?`
+                <button class="btn btn-outline btn-sm" onclick="viewSubmission(${a.id},${s.id})" style="font-size:11px">👁 Харах</button>
+                <input class="grade-input" type="number" placeholder="${a.points}" min="0" max="${a.points}" value="${sub.grade??''}" style="width:52px;margin-left:4px" onchange="updateGrade(${a.id},${s.id},this.value,${a.points})">
+              `:`<span style="font-size:11px;color:var(--ink-muted);font-weight:700">—</span>`}
+            </div>`).join('')}
+          ${a.points>0?`<button class="btn btn-amber" style="width:100%;margin-top:14px;justify-content:center" onclick="showToast('Дүн хадгалагдлаа ✓')">💾 Дүн хадгалах</button>`:''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function viewSubmission(asgnId,studentId){
+  const s=students.find(x=>x.id===studentId);
+  const sub=submissions[`${asgnId}_${studentId}`]||{};
+  const a=assignments.find(x=>x.id===asgnId);
+  gradeModalStudentId=studentId; gradeModalAsgnId=asgnId;
+  document.getElementById('submissionModalTitle').textContent=`${s.name} — ${a.title}`;
+  document.getElementById('submissionModalContent').innerHTML=`
+    <div style="margin-bottom:14px">
+      ${sub.files&&sub.files.length?renderFileList(sub.files):`<div style="color:var(--ink-muted);font-size:13px;font-weight:600">Файл хавсаргаагүй байна</div>`}
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:8px;padding:14px">
+      <span style="font-size:13px;font-weight:700">Оноо:</span>
+      <input class="grade-input" id="modalGradeInput" type="number" min="0" max="${a.points}" value="${sub.grade??''}" placeholder="${a.points}" style="width:70px">
+      <span style="font-size:13px;color:var(--ink-muted)">/ ${a.points}</span>
+    </div>`;
+  openModal('submissionModal');
+}
+
+function saveGradeFromModal(){
+  const val=document.getElementById('modalGradeInput')?.value;
+  if(gradeModalAsgnId&&gradeModalStudentId){
+    const a=assignments.find(x=>x.id===gradeModalAsgnId);
+    updateGrade(gradeModalAsgnId,gradeModalStudentId,val,a.points);
+  }
+  closeModal('submissionModal');
+  showToast('Дүн хадгалагдлаа ✓');
+  renderAssignmentDetail(currentAsgnId);
+}
+
+function renderAllAssignments(){
+  const list=document.getElementById('allAssignmentsList');
+  if(!assignments.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><p>Даалгавар байхгүй</p></div>';return;}
+  list.innerHTML=assignments.map(a=>{
+    const c=courses.find(x=>x.id===a.courseId);
+    const subs=students.filter(s=>['submitted','graded'].includes(submissions[`${a.id}_${s.id}`]?.status||'')).length;
+    return `<div class="assignment-card" onclick="navigateTo('assignment-detail',${a.id})">
+      <div class="asgn-icon" style="background:${a.color}">${a.emoji}</div>
+      <div class="asgn-info"><div class="asgn-title">${a.title}</div><div class="asgn-meta">${c?.name||''} · ${a.points>0?a.points+' оноо':'Оноогүй'}</div></div>
+      <div class="asgn-right">
+        ${a.due?`<div class="asgn-due">📅 ${a.due}</div>`:''}
+        <div style="font-size:11px;color:var(--green);font-weight:700;margin-top:4px">✅ ${subs}/${students.length}</div>
+      </div>
+    </div>`;}).join('');
+}
+
+function renderGrades(){
+  const gc=document.getElementById('gradesContent');
+  gc.innerHTML=`<div style="font-size:14px;color:var(--ink-soft);font-weight:600;margin-bottom:16px">Хичээл сонгоод дүнгийн дэвтэр харна уу</div>
+  <div class="course-grid">${courses.map(c=>`
+    <div class="course-card" onclick="navigateTo('course-detail',${c.id});setTimeout(()=>switchTab('gradebook',${c.id}),80)">
+      <div class="course-thumb" style="background:${COLORS[c.color]||c.color}"><div class="thumb-overlay"></div><div class="thumb-label">${c.emoji}</div></div>
+      <div class="course-info"><div class="course-name">${c.name}</div><div class="course-teacher">${c.teacher}</div></div>
+    </div>`).join('')}</div>`;
+}
+
+function updateGrade(asgnId,studentId,val,max){
+  const key=`${asgnId}_${studentId}`;
+  const v=Math.min(parseInt(val)||0,max);
+  submissions[key]={...(submissions[key]||{}),status:'graded',grade:v};
+}
+
+function postComment(asgnId){
+  const input=document.getElementById(`commentInput_${asgnId}`);
+  const text=input?.value?.trim();
+  if(!text){showToast('Сэтгэгдэл хоосон байна');return;}
+  if(!comments[asgnId]) comments[asgnId]=[];
+  comments[asgnId].push({author:teacherName,initials:teacherInitials,color:courses.find(c=>c.id===assignments.find(a=>a.id===asgnId)?.courseId)?.color||'#f59e0b',role:'teacher',text,date:new Date().toISOString().slice(0,10).replace(/-/g,'.'),files:[]});
+  renderAssignmentDetail(asgnId);
+  showToast('Сэтгэгдэл нийтлэгдлээ ✓');
+}
+
+function selectColor(el){
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected'); selectedColor=el.dataset.color;
+}
+
+function createCourse(){
+  const name=document.getElementById('newCourseName').value.trim();
+  const desc=document.getElementById('newCourseDesc').value.trim();
+  if(!name){showToast('Хичээлийн нэр шаардлагатай');return;}
+  const id=Date.now();
+  const joinCode=name.slice(0,3).toUpperCase()+String(courses.length+1).padStart(3,'0');
+  courses.push({id,name,teacher:teacherName,color:selectedColor,emoji:EMOJIS[selectedColor]||'📚',desc,joinCode,students:0});
+  closeModal('createCourseModal');
+  document.getElementById('newCourseName').value='';
+  document.getElementById('newCourseDesc').value='';
+  showToast(`"${name}" хичээл үүслээ ✓`);
+  renderHomeCourses(); renderCoursesPage(); updateStats();
+}
+
+function deleteCourse(id){
+  if(!confirm('Хичээлийг устгах уу?')) return;
+  courses=courses.filter(c=>c.id!==id);
+  showToast('Хичээл устгагдлаа');
+  navigateTo('courses');
+}
+
+function createAssignment(){
+  const title=document.getElementById('newAsgnTitle').value.trim();
+  const desc=document.getElementById('newAsgnDesc').value.trim();
+  const due=document.getElementById('newAsgnDue').value;
+  const points=parseInt(document.getElementById('newAsgnPoints').value)||0;
+  const type=document.getElementById('newAsgnType').value;
+  if(!title){showToast('Гарчиг шаардлагатай');return;}
+  if(!currentCourseId){showToast('Эхлээд хичээл сонгоно уу');return;}
+  const typeEmoji={assignment:'📝',video:'🎬',material:'📄',quiz:'🧪'};
+  const typeColor={assignment:'#fef3c7',video:'#dbeafe',material:'#f3f4f6',quiz:'#ede9fe'};
+  const id=Date.now();
+  const files=[...teacherUploadedFiles];
+  assignments.push({id,courseId:currentCourseId,title,desc:desc||'Тайлбар байхгүй.',type,due:due||null,points,emoji:typeEmoji[type],color:typeColor[type],files});
+  teacherUploadedFiles=[];
+  closeModal('createAssignmentModal');
+  document.getElementById('newAsgnTitle').value='';
+  document.getElementById('newAsgnDesc').value='';
+  document.getElementById('newAsgnDue').value='';
+  document.getElementById('teacherUploadedFiles').innerHTML='';
+  showToast(`"${title}" даалгавар нэмэгдлээ ✓`);
+  renderCourseDetail(currentCourseId);
+  setTimeout(()=>switchTab('assignments',currentCourseId),60);
+  updateStats();
+}
+
+function deleteAssignment(id){
+  if(!confirm('Даалгаврыг устгах уу?')) return;
+  assignments=assignments.filter(a=>a.id!==id);
+  showToast('Даалгавар устгагдлаа');
+  renderCourseDetail(currentCourseId);
+  updateStats();
+}
+
+function copyCode(code){navigator.clipboard?.writeText(code).catch(()=>{});showToast(`Код хуулагдлаа: ${code}`);}
+function showJoinCode(code){showToast(`Нэгдэх код: ${code}`);}
+function markAllRead(){document.querySelectorAll('.notif-item.unread').forEach(el=>el.classList.remove('unread'));showToast('Бүгдийг уншсан болголоо');}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+const ua=document.getElementById('teacherUploadArea');
+if(ua){
+  ua.addEventListener('dragover',e=>{e.preventDefault();ua.classList.add('dragover');});
+  ua.addEventListener('dragleave',()=>ua.classList.remove('dragover'));
+  ua.addEventListener('drop',e=>{
+    e.preventDefault();ua.classList.remove('dragover');
+    Array.from(e.dataTransfer.files).forEach(f=>{
+      const url=URL.createObjectURL(f);
+      teacherUploadedFiles.push({name:f.name,url,type:f.type,size:formatSize(f.size),_file:f});
+    });
+    renderTeacherUploadedFiles();
+  });
+}
+</script>
+</body>
+</html>
